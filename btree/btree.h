@@ -9,64 +9,75 @@ class BTree
 		/**
 		  * Default constructor.
 		  * Prevents implicit conversion.
+		  * Done.
 		*/
 		explicit BTree();	
 	
 		/**
 		  * Destructor. Should this call destroyTree()? Or implement it here.
+		  * Done.
 		*/
 		~BTree();
 
 		/**
 		  * Copy constructor for tree. Not allowing for implicit conversion.
+		  * Done.
 		*/
 		explicit BTree(const BTree<dataType>& copyTree);
 
 		/**
 		  * Overloaded = operator.
 		  * Invokes copy constructor.
+		  * Done.
 		*/
 		const BTree<dataType>& operator= (const BTree<dataType>& otherTree);
 
 		/**
 		  * Returns true if empty, false if filled.
+		  * Done.
 		*/
 		bool isEmpty() const;
 
 		/**
 		  * Returns height of binary tree.
 		  * Recursively calls height();
+		  * Done.
 		*/
 		int getHeight();
 
 		/**
 		  * Get amount of nodes in the tree.
 		*/	
-		int getNodeNum();
+	//	int getNodeNum();
 
 		/**
 		  * Return amount of leaves in the tree.
 		*/
-		int getLeafNum();
+	//	int getLeafNum();
 
 		/**
 		  * De-allocates tree.
 		  * Should this be in the destructor? Or invoked by the destructor?
+		  * Done.
 		*/
 		void destroyTree();
 
 		/**
 		  * Returns true if data is located in tree. False otherwise.
+		  * What type of search? O(n)? O(log n)?
+		  * Done.
 		*/
 		bool search(const dataType& searchData) const;
 
 		/**
 		  * Inserts data into tree.
+		  * Done.
 		*/
 		void insert(const dataType& insertData);
 	
 		/**
 		  * Deletes a node with the same dataType as deleteItem.
+		  * Done.
 		*/	
 		void deleteNode(const dataType& deleteItem);
 		
@@ -75,19 +86,18 @@ class BTree
 		/**
 		  * Tree structure.
 		*/
-		template<class dataType>
 		struct node
 		{
 			dataType info;
-			node<dataType>* left;
-			node<dataType>* right;
+			node* left;
+			node* right;
 		};
 
 		/**
 		  * Head of tree.
 		  * Points to the info it contains and the left and right links.
 		*/
-		node<dataType> *root;
+		node* root;
 
 		/**
 		  * Copy a tree.
@@ -96,19 +106,19 @@ class BTree
 		  * Why is one a pointer reference and one a pointer?
 		  * Should they not both be references?
 		*/
-		void copyTree(node<dataType>* &newTree, const node<dataType>* oldTree);
+		void copyTree(node* &newTree, const node* oldTree);
 	
 		/**
 		  * Destroys tree. Recursively called.
 		  * Should this be in destructor?
 		*/
-		void destroyTree(node<dataType>* &p);
+		void destroyTree(node* &p);
 
 		/**
 		  * Recursively counts height of binary tree.
 		  * Returns max of left and right.
 		*/
-		int getHeight(node<dataType>* p) const;
+		int getHeight(node* p) const;
 
 		/**
 		  * Returns the maximum of 2 values.
@@ -119,14 +129,13 @@ class BTree
 		/**
 		  * Recursively counts the amount of nodes.
 		*/
-		int getNodeNum(node<dataType>* p) const;
+		//int getNodeNum(node* p) const;
 
 		/**
 		  * Recursively counts the amount of leaves.
 		*/
-		int getLeafNum(node<dataType>* p) const;
-
-}
+	//	int getLeafNum(node* p) const;
+};
 
 /** Templated Function Definitions */
 
@@ -135,7 +144,7 @@ class BTree
   * Prevents implicit conversion.
 */
 template<class dataType>
-explicit BTree<dataType>:BTree()	
+BTree<dataType>::BTree()	
 {
 	root = nullptr;
 }
@@ -152,7 +161,7 @@ BTree<dataType>::~BTree()
   * Copy constructor for tree. Not allowing for implicit conversion.
 */
 template<class dataType>
-explicit BTree<dataType>::BTree(const BTree<dataType>& copyTree)
+BTree<dataType>::BTree(const BTree<dataType>& copyTree)
 {
 	if(copyTree.root == nullptr)
 		root = nullptr;
@@ -165,7 +174,7 @@ explicit BTree<dataType>::BTree(const BTree<dataType>& copyTree)
   * Invokes copy constructor.
 */
 template<class dataType>
-const BTree<dataType>::binaryTreeType<dataType>& operator= (const BTree<dataType>& otherTree)
+const BTree<dataType>& BTree<dataType>::operator=(const BTree<dataType>& otherTree)
 {
 	if(this != &otherTree)
 	{
@@ -201,21 +210,19 @@ int BTree<dataType>::getHeight()
 
 /**
   * Get amount of nodes in the tree.
-*/	
 template<class dataType>
 int BTree<dataType>::getNodeNum()
 {
 	return(getNodeNum(root));
-}
+}*/
 
 /**
   * Return amount of leaves in the tree.
-*/
 template<class dataType>
 int BTree<dataType>::getLeafNum()
 {
 	return(getLeafNum(root));
-}
+}*/
 
 /**
   * De-allocates tree.
@@ -233,7 +240,7 @@ void BTree<dataType>::destroyTree()
 template<class dataType>
 bool BTree<dataType>::search(const dataType& searchData) const
 {
-	node<dataType>* current;
+	node* current;
 
 	bool found = false;
 
@@ -257,19 +264,21 @@ bool BTree<dataType>::search(const dataType& searchData) const
   * Inserts data into tree.
 */
 template<class dataType>
-void BTree<dataType>::insert(const dataType& insertData) const
+void BTree<dataType>::insert(const dataType& insertData)
 {
-	node<dataType>* current;
-	node<dataType>* trailCurrent;
-	node<dataType>* newNode;
+	node* current;
+	node* trailCurrent;
+	node* newNode;
 	
-	newNode = new node<dataType>;
+	newNode = new node();
 	newNode->info = insertData;
 	newNode->left = nullptr;
 	newNode->right = nullptr;
 
 	if(root == nullptr)
-		root = node;
+	{
+		root = newNode; 
+	}
 	else
 	{
 		current = root;
@@ -299,9 +308,9 @@ void BTree<dataType>::insert(const dataType& insertData) const
 template<class dataType>
 void BTree<dataType>::deleteNode(const dataType& deleteItem)
 {
-	node<dataType>* current;
-	node<dataType>* trailCurrent;
-	node<dataType>* temp;
+	node* current;
+	node* trailCurrent;
+	node* temp;
 
 	if(deleteItem == nullptr)
 		return;
@@ -351,13 +360,13 @@ void BTree<dataType>::deleteNode(const dataType& deleteItem)
   * Should this just be in copy constructor?
 */
 template<class dataType>
-void BTree<dataTye>::copyTree(node<dataType>* &newTree, const node<dataType>* oldTree)
+void BTree<dataType>::copyTree(node* &newTree, const node* oldTree)
 {
 	if(oldTree == nullptr)
 		newTree = nullptr;
 	else
 	{
-		newTree = new node<dataType>
+		newTree = new node;
 		newTree->info = oldTree->info;
 		copyTree(newTree->left, oldTree->left);
 		copyTree(newTree->right, oldTree->right);
@@ -369,7 +378,7 @@ void BTree<dataTye>::copyTree(node<dataType>* &newTree, const node<dataType>* ol
   * Should this be in destructor?
 */
 template<class dataType>
-void BTree<dataType>::destroyTree(node<dataType>* &p)
+void BTree<dataType>::destroyTree(node* &p)
 {
 	if(p != nullptr)
 	{
@@ -386,7 +395,7 @@ void BTree<dataType>::destroyTree(node<dataType>* &p)
   * Why not just use math lib for max rather than invoking a private func??
 */
 template<class dataType>
-int BTree<dataType>::getHeight(node<dataType>* p) const
+int BTree<dataType>::getHeight(node* p) const
 {
 	if(p == nullptr)
 		return(0);
@@ -396,19 +405,17 @@ int BTree<dataType>::getHeight(node<dataType>* p) const
 
 /**
   * Recursively counts the amount of nodes.
-*/
 template<class dataType>
-int BTree<dataType>::getNodeNum(node<dataType>* p) const
+int BTree<dataType>::getNodeNum(node* p) const
 {
-}
+}*/
 
 /**
   * Recursively counts the amount of leaves.
-*/
 template<class dataType>
-int BTree<dataType>::getLeafNum(node<dataType>* p) const
+int BTree<dataType>::getLeafNum(node* p) const
 {
-}
+}*/
 
 template<class dataType>
 int BTree<dataType>::max(int x, int y) const
