@@ -1,6 +1,8 @@
 #include "btree.h"
 #include <gtest/gtest.h>
 
+//test
+
 TEST(Construct, Initial)
 {
 	BTree<int>* test = new BTree<int>();
