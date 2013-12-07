@@ -245,7 +245,7 @@ bool BTree<dataType>::search(const dataType& searchData) const
 	bool found = false;
 
 	if(root == nullptr)
-		return(false);
+		found = false;
 	else
 	{
 		current = root;
@@ -258,6 +258,8 @@ bool BTree<dataType>::search(const dataType& searchData) const
 				current = current->right;
 		}
 	}
+
+	return(found);
 }
 
 /**
@@ -400,7 +402,7 @@ int BTree<dataType>::getHeight(node* p) const
 	if(p == nullptr)
 		return(0);
 	else
-		return( (max(height(p->left)), getHeight(p->right)) + 1);
+		return( (max(getHeight(p->left)), getHeight(p->right)) + 1);
 }
 
 /**

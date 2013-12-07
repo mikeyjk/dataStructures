@@ -1,39 +1,58 @@
 #include "btree.h"
 #include <gtest/gtest.h>
 
+TEST(Construct, Initial)
+{
+	BTree<int>* test = new BTree<int>();
+
+	EXPECT_EQ(true, test->isEmpty());
+
+	delete test;
+}
+
+TEST(InsertSearch, Number)
+{
+	BTree<int>* test = new BTree<int>();
+	// empty tree
+
+	// search for int 2, shouldn't exist
+	EXPECT_EQ(false, test->search(2)); 
+	
+	// insert int 2
+	test->insert(2);
+
+	// search for int 2, should exist
+	EXPECT_EQ(true, test->search(2));
+	
+	delete test;
+}
+
+TEST(GetHeight, Number)
+{
+	BTree<int>* test = new BTree<int>();
+	
+	EXPECT_EQ(0, test->getHeight());
+
+	test->insert(2);
+
+	EXPECT_EQ(1, test->getHeight());
+
+	delete test;
+}
+
+
 int main(int argc, char** argv)
 {
+	::testing::InitGoogleTest(&argc, argv);
 	return(RUN_ALL_TESTS());
 }
 		/**
-		  * Default constructor.
-		  * Prevents implicit conversion.
-		  * Done.
-		explicit BTree();	
-	
-		  * Destructor. Should this call destroyTree()? Or implement it here.
-		  * Done.
-		~BTree();
-
-		  * Copy constructor for tree. Not allowing for implicit conversion.
-		  * Done.
-		explicit BTree(const BTree<dataType>& copyTree);
-
 		  * Overloaded = operator.
 		  * Invokes copy constructor.
 		  * Done.
 		const BTree<dataType>& operator= (const BTree<dataType>& otherTree);
 
-		  * Returns true if empty, false if filled.
-		  * Done.
-		bool isEmpty() const;
-
-		  * Returns height of binary tree.
-		  * Recursively calls height();
-		  * Done.
-		int getHeight();
-
-		  * Get amount of nodes in the tree.
+		  		  * Get amount of nodes in the tree.
 		  * Done.
 	//	int getNodeNum();
 
@@ -51,10 +70,7 @@ int main(int argc, char** argv)
 		  * Done.
 		bool search(const dataType& searchData) const;
 
-		  * Inserts data into tree.
-		void insert(const dataType& insertData);
-	
-		  * Deletes a node with the same dataType as deleteItem.
+				  * Deletes a node with the same dataType as deleteItem.
 		void deleteNode(const dataType& deleteItem);
 		
 		  * Tree structure.
