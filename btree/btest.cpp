@@ -27,6 +27,7 @@ TEST(InsertSearch, Number)
 	delete test;
 }
 
+// remember how btree height works
 TEST(GetHeight, Number)
 {
 	BTree<int>* test = new BTree<int>();
@@ -36,6 +37,14 @@ TEST(GetHeight, Number)
 	test->insert(2);
 
 	EXPECT_EQ(1, test->getHeight());
+
+	test->insert(3);
+
+	EXPECT_EQ(2, test->getHeight());
+
+	test->insert(1);
+
+	EXPECT_EQ(3, test->getHeight());
 
 	delete test;
 }
