@@ -1,6 +1,28 @@
 #ifndef btree_h
 #define btree_h
 
+/** 
+  * Class: BTree
+  * Binary Search Tree
+  *
+  * Binary Search Tree is essentially a data structure which exploits how
+  * efficient binary searches are. Log n search because it can reduce
+  * the search space each check.
+  *
+  * Left sub-tree contains nodes with keys less than the node's key.
+  * Right sub-tree contains nodes with keys greater than the node's key.
+  * Left & Right sub-tree are also BSTrees.
+  * Must contain no duplicate nodes.
+  *
+  * Space: O(n), worst O(n)
+  * Search: O(log n), worst O(n)
+  * Insert: O(log n), worst O(n)
+  * Delete: O(log n), worst O(n)
+  *
+  * Author: Michael J. Kiernan
+  *
+*/
+
 template <class dataType>
 class BTree
 {

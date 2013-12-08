@@ -1,8 +1,7 @@
 #include "btree.h"
 #include <gtest/gtest.h>
 
-//test
-
+// default constructor
 TEST(Construct, Initial)
 {
 	BTree<int>* test = new BTree<int>();
@@ -12,6 +11,20 @@ TEST(Construct, Initial)
 	delete test;
 }
 
+// copy cstror
+/**
+TEST(CopyConstruct, Initial)
+{
+	BTree<int>* original = new BTree<int>();
+	
+	original->insert(2);
+
+	BTree<int>* copied = new BTree<int>(original);
+
+	EXPECT_EQ(true, test->search(2));	
+}	*/
+
+// insert an element and be able to find it
 TEST(InsertSearch, Number)
 {
 	BTree<int>* test = new BTree<int>();
@@ -29,6 +42,7 @@ TEST(InsertSearch, Number)
 	delete test;
 }
 
+// getHeight
 // remember how btree height works
 TEST(GetHeight, Number)
 {
