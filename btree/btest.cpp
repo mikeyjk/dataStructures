@@ -12,17 +12,24 @@ TEST(Construct, Initial)
 }
 
 // copy cstror
-/**
 TEST(CopyConstruct, Initial)
 {
-	BTree<int>* original = new BTree<int>();
+	BTree<int> original;
+	// empty tree
+
+	// search for int 2, shouldn't exist
+	EXPECT_EQ(false, original.search(2)); 
 	
-	original->insert(2);
+	// insert int 2
+	original.insert(2);
 
-	BTree<int>* copied = new BTree<int>(original);
+	// search for int 2, should exist
+	EXPECT_EQ(true, original.search(2));
 
-	EXPECT_EQ(true, test->search(2));	
-}	*/
+	BTree<int> copied(original);
+
+	EXPECT_EQ(true, copied.search(2));	
+}
 
 // insert an element and be able to find it
 TEST(InsertSearch, Number)
@@ -57,10 +64,6 @@ TEST(GetHeight, Number)
 	test->insert(3);
 
 	EXPECT_EQ(2, test->getHeight());
-
-	test->insert(1);
-
-	EXPECT_EQ(3, test->getHeight());
 
 	delete test;
 }

@@ -1,13 +1,22 @@
 #ifndef btree_h
 #define btree_h
 
+#include <iostream>
+
 /** 
   * Class: BTree
   * Binary Search Tree
   *
   * Binary Search Tree is essentially a data structure which exploits how
   * efficient binary searches are. Log n search because it can reduce
-  * the search space each check.
+  * the search space each check. It can also devolve into a linked list
+  * and that should be avoided because that would result in worst case!
+  *
+  * Used In:
+  *
+  *	Huffman Coding - compression algorithm
+  *	Expression Parsers / Solvers
+  *	Database Indexing
   *
   * Left sub-tree contains nodes with keys less than the node's key.
   * Right sub-tree contains nodes with keys greater than the node's key.
@@ -15,17 +24,77 @@
   * Must contain no duplicate nodes.
   *
   * Space: O(n), worst O(n)
-  * Search: O(log n), worst O(n)
-  * Insert: O(log n), worst O(n)
+  * Search: O(log n), worst O(n) (linked list)
+  * Insert: O(log n), worst O(n) 
   * Delete: O(log n), worst O(n)
   *
   * Author: Michael J. Kiernan
+  *
+  * TODO: rule of five (for C++11):
+  *	  - destructor, copy ctr, move ctr, copy assignment operator, move assignment operator
   *
 */
 
 template <class dataType>
 class BTree
 {
+	private:
+
+		/**
+		  * Tree structure.
+		*/
+		struct node
+		{
+			dataType info;
+			node* left;
+			node* right;
+		};
+
+		void printTree(node* tree) const;
+	
+		/**
+		  * Head of tree.
+		  * Points to the info it contains and the left and right links.
+		*/
+		node* root;
+
+		/**
+		  * Copy a tree.
+		  * Called by copy constructor?
+		  * Should this just be in copy constructor?
+		  * Why is one a pointer reference and one a pointer?
+		  * Should they not both be references?
+		*/
+		void copyTree(node* newTree, const node* oldTree);
+	
+		/**
+		  * Destroys tree. Recursively called.
+		  * Should this be in destructor?
+		*/
+		void destroyTree(node* &p);
+
+		/**
+		  * Recursively counts height of binary tree.
+		  * Returns max of left and right.
+		*/
+		int getHeight(node* p) const;
+
+		/**
+		  * Returns the maximum of 2 values.
+		  * Once again just following the book but why wouldn't an STL call be invoked.
+		*/
+		int max(int x, int y) const;
+
+		/**
+		  * Recursively counts the amount of nodes.
+		*/
+		//int getNodeNum(node* p) const;
+
+		/**
+		  * Recursively counts the amount of leaves.
+		*/
+	//	int getLeafNum(node* p) const;
+	
 	public:
 
 		/**
@@ -45,14 +114,14 @@ class BTree
 		  * Copy constructor for tree. Not allowing for implicit conversion.
 		  * Done.
 		*/
-		explicit BTree(const BTree<dataType>& copyTree);
+		explicit BTree(const node& refTree);
 
 		/**
 		  * Overloaded = operator.
 		  * Invokes copy constructor.
 		  * Done.
 		*/
-		const BTree<dataType>& operator= (const BTree<dataType>& otherTree);
+		const BTree<dataType>& operator= (const BTree<dataType>& rVal);
 
 		/**
 		  * Returns true if empty, false if filled.
@@ -65,8 +134,9 @@ class BTree
 		  * Recursively calls height();
 		  * Done.
 		*/
-		int getHeight();
+		int getHeight() const;
 
+		void printTree() const;
 		/**
 		  * Get amount of nodes in the tree.
 		*/	
@@ -103,61 +173,37 @@ class BTree
 		*/	
 		void deleteNode(const dataType& deleteItem);
 		
-	private:
-
-		/**
-		  * Tree structure.
-		*/
-		struct node
-		{
-			dataType info;
-			node* left;
-			node* right;
-		};
-
-		/**
-		  * Head of tree.
-		  * Points to the info it contains and the left and right links.
-		*/
-		node* root;
-
-		/**
-		  * Copy a tree.
-		  * Called by copy constructor?
-		  * Should this just be in copy constructor?
-		  * Why is one a pointer reference and one a pointer?
-		  * Should they not both be references?
-		*/
-		void copyTree(node* &newTree, const node* oldTree);
-	
-		/**
-		  * Destroys tree. Recursively called.
-		  * Should this be in destructor?
-		*/
-		void destroyTree(node* &p);
-
-		/**
-		  * Recursively counts height of binary tree.
-		  * Returns max of left and right.
-		*/
-		int getHeight(node* p) const;
-
-		/**
-		  * Returns the maximum of 2 values.
-		  * Once again just following the book but why wouldn't an STL call be invoked.
-		*/
-		int max(int x, int y) const;
-
-		/**
-		  * Recursively counts the amount of nodes.
-		*/
-		//int getNodeNum(node* p) const;
-
-		/**
-		  * Recursively counts the amount of leaves.
-		*/
-	//	int getLeafNum(node* p) const;
 };
+
+template<class dataType>
+void BTree<dataType>::printTree() const
+{
+	if(root != nullptr)
+	{
+		std::cout << root->info << std::endl;
+		printTree(root->left);
+		printTree(root->right);
+	}
+	else
+	{
+		std::cout << "\nroot is null.";
+	}
+}
+
+template<class dataType>
+void BTree<dataType>::printTree(node* tree) const
+{
+	if(tree != nullptr)
+	{
+		std::cout << tree->info << std::endl;
+		printTree(tree->left);
+		printTree(tree->right);	
+	}
+	else
+	{
+		std::cout << "\nnode is null.";
+	}
+}
 
 /** Templated Function Definitions */
 
@@ -183,12 +229,45 @@ BTree<dataType>::~BTree()
   * Copy constructor for tree. Not allowing for implicit conversion.
 */
 template<class dataType>
-BTree<dataType>::BTree(const BTree<dataType>& copyTree)
-{
-	if(copyTree.root == nullptr)
+BTree<dataType>::BTree(const node& refTree)
+{	
+	if(refTree == nullptr)
+	{
 		root = nullptr;
+		std::cout << "\ntree to copy is null." << std::endl;
+	}
 	else
-		copyTree(root, copyTree.root);
+	{
+		copyTree(root, refTree);
+	}
+}
+
+/**
+  * Copy a tree.
+  * Called by copy constructor?
+  * Should this just be in copy constructor?
+*/
+template<class dataType>
+void BTree<dataType>::copyTree(node* newTree, const node* oldTree)
+{
+	if(oldTree == nullptr)
+	{
+		newTree = nullptr;
+		std::cout << "\noldTree: " << oldTree << std::endl;
+		std::cout << "\nOld tree is null so new tree is null: " << std::endl;
+	}
+	else
+	{
+		newTree = new node();
+		newTree->info = oldTree->info;
+		std::cout << "\nnewtree%: " << newTree << std::endl;
+		std::cout << "\nnewtreeinfo: " << newTree->info << std::endl;
+		std::cout << "\noldtreeinfo: " << oldTree->info << std::endl;
+		copyTree(newTree->left, oldTree->left);
+		copyTree(newTree->right, oldTree->right);
+	}
+
+	std::cout << "\nnewTree out of if else: " << newTree;
 }
 
 /**
@@ -196,16 +275,16 @@ BTree<dataType>::BTree(const BTree<dataType>& copyTree)
   * Invokes copy constructor.
 */
 template<class dataType>
-const BTree<dataType>& BTree<dataType>::operator=(const BTree<dataType>& otherTree)
+const BTree<dataType>& BTree<dataType>::operator=(const BTree<dataType>& rVal)
 {
-	if(this != &otherTree)
+	if(this != &rVal)
 	{
 		if(root != nullptr)
 			destroy(root);
-		if(otherTree.root = nullptr)
+		if(rVal.root = nullptr)
 			root = nullptr;
 		else
-			copyTree(root, otherTree.root);
+			copyTree(root, rVal.root);
 	}
 
 	return(*this);
@@ -225,7 +304,7 @@ bool BTree<dataType>::isEmpty() const
   * Recursively calls height();
 */
 template<class dataType>
-int BTree<dataType>::getHeight()
+int BTree<dataType>::getHeight() const
 {
 	return(getHeight(root));
 }
@@ -375,25 +454,6 @@ void BTree<dataType>::deleteNode(const dataType& deleteItem)
 			trailCurrent->right = current->left;
 
 		delete current;
-	}
-}
-
-/**
-  * Copy a tree.
-  * Called by copy constructor?
-  * Should this just be in copy constructor?
-*/
-template<class dataType>
-void BTree<dataType>::copyTree(node* &newTree, const node* oldTree)
-{
-	if(oldTree == nullptr)
-		newTree = nullptr;
-	else
-	{
-		newTree = new node;
-		newTree->info = oldTree->info;
-		copyTree(newTree->left, oldTree->left);
-		copyTree(newTree->right, oldTree->right);
 	}
 }
 
