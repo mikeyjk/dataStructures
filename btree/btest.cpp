@@ -29,6 +29,8 @@ TEST(CopyConstruct, Initial)
 	BTree<int> copied(original);
 
 	EXPECT_EQ(true, copied.search(2));	
+
+	copied.printTree();
 }
 
 // insert an element and be able to find it
@@ -64,6 +66,8 @@ TEST(GetHeight, Number)
 	test->insert(3);
 
 	EXPECT_EQ(2, test->getHeight());
+
+	test->printTree();
 
 	delete test;
 }

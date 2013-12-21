@@ -23,8 +23,8 @@
   * Left & Right sub-tree are also BSTrees.
   * Must contain no duplicate nodes.
   *
-  * Space: O(n), worst O(n)
-  * Search: O(log n), worst O(n) (linked list)
+  * Space: O(n), worst O(n) (linked list)
+  * Search: O(log n), worst O(n) 
   * Insert: O(log n), worst O(n) 
   * Delete: O(log n), worst O(n)
   *
@@ -42,6 +42,8 @@ class BTree
 
 		/**
 		  * Tree structure.
+		  * Templated data/payload.
+		  * Left node and Right node.
 		*/
 		struct node
 		{
@@ -50,28 +52,25 @@ class BTree
 			node* right;
 		};
 
-		void printTree(node* tree) const;
+		void printTree(node*& tree) const;
 	
 		/**
 		  * Head of tree.
-		  * Points to the info it contains and the left and right links.
 		*/
 		node* root;
 
 		/**
 		  * Copy a tree.
-		  * Called by copy constructor?
-		  * Should this just be in copy constructor?
-		  * Why is one a pointer reference and one a pointer?
-		  * Should they not both be references?
+		  * Called by copy constructor.
+		  * Used recursively on left and right sub tree.
+		  * TODO: Is a reference more appropriate? Tree could be large.
 		*/
-		void copyTree(node* newTree, const node* oldTree);
+		void copyTree(node* newTree, const node*& oldTree);
 	
 		/**
 		  * Destroys tree. Recursively called.
-		  * Should this be in destructor?
 		*/
-		void destroyTree(node* &p);
+		void destroyTree(node* p);
 
 		/**
 		  * Recursively counts height of binary tree.
@@ -82,16 +81,19 @@ class BTree
 		/**
 		  * Returns the maximum of 2 values.
 		  * Once again just following the book but why wouldn't an STL call be invoked.
+		  * TODO: Replace this with <math> max() or something.
 		*/
 		int max(int x, int y) const;
 
 		/**
 		  * Recursively counts the amount of nodes.
+		  * TODO: This.
 		*/
 		//int getNodeNum(node* p) const;
 
 		/**
 		  * Recursively counts the amount of leaves.
+		  * TODO: This.
 		*/
 	//	int getLeafNum(node* p) const;
 	
@@ -100,43 +102,40 @@ class BTree
 		/**
 		  * Default constructor.
 		  * Prevents implicit conversion.
-		  * Done.
 		*/
 		explicit BTree();	
 	
 		/**
-		  * Destructor. Should this call destroyTree()? Or implement it here.
-		  * Done.
+		  * Destructor. 
 		*/
 		~BTree();
 
 		/**
-		  * Copy constructor for tree. Not allowing for implicit conversion.
-		  * Done.
+		  * Copy constructor. 
+		  * Not allowing for implicit conversion.
 		*/
 		explicit BTree(const node& refTree);
 
 		/**
 		  * Overloaded = operator.
 		  * Invokes copy constructor.
-		  * Done.
+		  * TODO: Broken due to reference usage?
 		*/
 		const BTree<dataType>& operator= (const BTree<dataType>& rVal);
 
 		/**
 		  * Returns true if empty, false if filled.
-		  * Done.
 		*/
 		bool isEmpty() const;
 
 		/**
 		  * Returns height of binary tree.
 		  * Recursively calls height();
-		  * Done.
 		*/
 		int getHeight() const;
 
 		void printTree() const;
+		
 		/**
 		  * Get amount of nodes in the tree.
 		*/	
@@ -191,7 +190,7 @@ void BTree<dataType>::printTree() const
 }
 
 template<class dataType>
-void BTree<dataType>::printTree(node* tree) const
+void BTree<dataType>::printTree(node*& tree) const
 {
 	if(tree != nullptr)
 	{
@@ -248,7 +247,7 @@ BTree<dataType>::BTree(const node& refTree)
   * Should this just be in copy constructor?
 */
 template<class dataType>
-void BTree<dataType>::copyTree(node* newTree, const node* oldTree)
+void BTree<dataType>::copyTree(node* newTree, const node*& oldTree)
 {
 	if(oldTree == nullptr)
 	{
@@ -462,7 +461,7 @@ void BTree<dataType>::deleteNode(const dataType& deleteItem)
   * Should this be in destructor?
 */
 template<class dataType>
-void BTree<dataType>::destroyTree(node* &p)
+void BTree<dataType>::destroyTree(node* p)
 {
 	if(p != nullptr)
 	{
