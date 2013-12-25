@@ -50,10 +50,11 @@ class BTree
 			dataType info;
 			node* left;
 			node* right;
+
+			node(const dataType& data) 
+				: info(data), left(nullptr), right(nullptr) {}
 		};
 
-		void printTree(node*& tree) const;
-	
 		/**
 		  * Head of tree.
 		*/
@@ -65,7 +66,7 @@ class BTree
 		  * Used recursively on left and right sub tree.
 		  * TODO: Is a reference more appropriate? Tree could be large.
 		*/
-		void copyTree(node* newTree, const node*& oldTree);
+		void copyTree(node*& newTree, const node* oldTree);
 	
 		/**
 		  * Destroys tree. Recursively called.
@@ -79,13 +80,6 @@ class BTree
 		int getHeight(node* p) const;
 
 		/**
-		  * Returns the maximum of 2 values.
-		  * Once again just following the book but why wouldn't an STL call be invoked.
-		  * TODO: Replace this with <math> max() or something.
-		*/
-		int max(int x, int y) const;
-
-		/**
 		  * Recursively counts the amount of nodes.
 		  * TODO: This.
 		*/
@@ -96,6 +90,19 @@ class BTree
 		  * TODO: This.
 		*/
 	//	int getLeafNum(node* p) const;
+
+		/**
+		  * Returns the maximum of 2 values.
+		  * Once again just following the book but why wouldn't an STL call be invoked.
+		  * TODO: Replace this with <math> max() or something.
+		*/
+		int max(int x, int y) const;
+
+		/**
+		 * Recursively prints out Binary Tree to std out.
+		 * Private.
+		 * */
+		void printTree(const node* refTree) const;
 	
 	public:
 
@@ -106,16 +113,17 @@ class BTree
 		explicit BTree();	
 	
 		/**
-		  * Destructor. 
-		*/
-		~BTree();
-
-		/**
 		  * Copy constructor. 
 		  * Not allowing for implicit conversion.
 		*/
-		explicit BTree(const node& refTree);
-
+		explicit BTree(const BTree<dataType>& refTree);
+		
+		/**
+		  * Destructor. 
+		  * Public.
+		*/
+		~BTree();
+		
 		/**
 		  * Overloaded = operator.
 		  * Invokes copy constructor.
@@ -134,6 +142,11 @@ class BTree
 		*/
 		int getHeight() const;
 
+		/**
+		 * Prints out the contents of a tree.
+		 * Assumes that the datatype is able to be handed by cout.
+		 * Could be pretty readily broken and is mainly used to debug.
+		 * */
 		void printTree() const;
 		
 		/**
@@ -148,15 +161,14 @@ class BTree
 
 		/**
 		  * De-allocates tree.
-		  * Should this be in the destructor? Or invoked by the destructor?
-		  * Done.
+		  * Invoked by the destructor.
 		*/
 		void destroyTree();
 
 		/**
+		  * Binary Search.
 		  * Returns true if data is located in tree. False otherwise.
-		  * What type of search? O(n)? O(log n)?
-		  * Done.
+		  * Public.
 		*/
 		bool search(const dataType& searchData) const;
 
@@ -174,6 +186,216 @@ class BTree
 		
 };
 
+/** Templated Function Definitions */
+
+/** Private */
+
+/**
+  * Copy a tree.
+  * Called by copy constructor.
+  * Used recursively on left and right sub tree.
+  * Private.
+  * TODO: Is a reference more appropriate? Tree could be large.
+*/
+template<class dataType>
+void BTree<dataType>::copyTree(node*& newTree, const node* oldTree)
+{
+	std::cout << "Value of newTree aka root: " << newTree << std::endl;
+
+	if(oldTree == nullptr)
+	{
+		newTree = nullptr;
+		std::cout << "Old tree node is null so new tree node is null: " << std::endl;
+	}
+	else // not null
+	{
+		std::cout << "Old tree node is allocd so new tree node is allocd: " << std::endl;
+		std::cout << "newTree prior to alloc: " << &root << " " << root << std::endl;
+		std::cout << "new: " << new node(oldTree->info);
+		newTree = new node(oldTree->info);
+	       	copyTree(newTree->left, oldTree->left);
+		copyTree(newTree->right, oldTree->right);
+		std::cout << "newTree post alloc: " << &root << " " << root << std::endl;
+	}
+}
+
+/**
+  * Destroys tree. Recursively called.
+  * Private.
+*/
+template<class dataType>
+void BTree<dataType>::destroyTree(node* p)
+{
+	if(p != nullptr)
+	{
+		destroyTree(p->left);
+		
+		destroyTree(p->right);
+		
+		delete(p);
+		
+		p = nullptr;
+		
+	}
+}
+
+/**
+  * Recursively counts height of binary tree.
+  * Returns max of left and right.
+  * Private.
+  * TODO: Remove max() local func for math lib?
+*/
+template<class dataType>
+int BTree<dataType>::getHeight(node* p) const
+{
+	if(p == nullptr)
+		return(0);
+	else
+		return( (max(getHeight(p->left), getHeight(p->right)) + 1));
+}
+
+/**
+  * Recursively counts the amount of nodes.
+template<class dataType>
+int BTree<dataType>::getNodeNum(node* p) const
+{
+}*/
+
+/**
+  * Recursively counts the amount of leaves.
+template<class dataType>
+int BTree<dataType>::getLeafNum(node* p) const
+{
+}*/
+
+/**
+  * Returns the maximum of 2 values.
+  * Once again just following the book but why wouldn't an STL call be invoked.
+  * TODO: Replace this with <math> max() or something.
+*/
+template<class dataType>
+int BTree<dataType>::max(int x, int y) const
+{
+	if(x >= y)
+		return(x);
+	else
+		return(y);
+}
+
+/**
+ * Recursively prints out Binary Tree to std out.
+ * Private.
+ * */
+template<class dataType>
+void BTree<dataType>::printTree(const node* refTree) const
+{
+	if(refTree != nullptr)
+	{
+		std::cout << refTree->info << std::endl;
+		std::cout << "/ " << std::endl;
+		printTree(refTree->left);
+		std::cout << " \\" << std::endl;
+		printTree(refTree->right);	
+	}
+	else
+	{
+		std::cout << "Null." << std::endl;
+	}
+}
+
+/** Public */
+
+template<class dataType>
+BTree<dataType>::BTree()	
+{
+	root = nullptr;
+}
+
+/**
+  * Copy constructor. 
+  * Not allowing for implicit conversion.
+  * Public.
+*/
+template<class dataType>
+BTree<dataType>::BTree(const BTree<dataType>& refTree)
+{
+	std::cout << "root: " << root << " " << &root << std::endl;
+
+	if(refTree.root == nullptr)
+	{
+		root = nullptr;
+		std::cout << "\nrefTree.root is null." << std::endl;
+	}
+	else
+	{
+		std::cout << "Root before copy: " << &root << " " << root << std::endl;
+		copyTree(root, refTree.root);
+		std::cout << "Root after copy: " << &root << " " << root << std::endl;
+	}
+}
+
+/**
+  * Destructor. 
+  * Public.
+  * TODO: Finish this?
+*/
+template<class dataType>
+BTree<dataType>::~BTree()
+{
+	destroyTree();
+}
+
+/**
+  * Overloaded = operator.
+  * Invokes copy constructor.
+  * Public.
+*/
+template<class dataType>
+const BTree<dataType>& BTree<dataType>::operator=(const BTree<dataType>& rVal)
+{
+	if(this != &rVal) // if they don't match, otherwise we automatically have achieved our goal
+	{
+		if(root != nullptr) // if root isn't null
+		{
+			destroyTree(root); // clear it / make it null
+			root = nullptr;
+		}
+
+		if(rVal.root != nullptr) // if rvalue is null
+			copyTree(&root, rVal.root);
+	}
+
+	return(*this);
+}
+
+/**
+  * Returns true if empty, false if filled.
+  * Public.
+*/
+template<class dataType>
+bool BTree<dataType>::isEmpty() const
+{
+	return(root == nullptr); // 1/true if null 0/false if not null
+}
+
+/**
+  * Returns height of binary tree.
+  * Recursively calls height();
+  * Public.
+*/
+template<class dataType>
+int BTree<dataType>::getHeight() const
+{
+	return(getHeight(root));
+}
+
+/**
+ * Prints out the contents of a tree.
+ * Assumes that the datatype is able to be handed by cout.
+ * Could be pretty readily broken and is mainly used to debug.
+ * Public.
+ *
+ * */
 template<class dataType>
 void BTree<dataType>::printTree() const
 {
@@ -185,127 +407,8 @@ void BTree<dataType>::printTree() const
 	}
 	else
 	{
-		std::cout << "\nroot is null.";
+		std::cout << "Null." << std::endl;
 	}
-}
-
-template<class dataType>
-void BTree<dataType>::printTree(node*& tree) const
-{
-	if(tree != nullptr)
-	{
-		std::cout << tree->info << std::endl;
-		printTree(tree->left);
-		printTree(tree->right);	
-	}
-	else
-	{
-		std::cout << "\nnode is null.";
-	}
-}
-
-/** Templated Function Definitions */
-
-/**
-  * Default constructor.
-  * Prevents implicit conversion.
-*/
-template<class dataType>
-BTree<dataType>::BTree()	
-{
-	root = nullptr;
-}
-
-/**
-  * Destructor. Should this call destroyTree()? Or implement it here.
-*/
-template<class dataType>
-BTree<dataType>::~BTree()
-{
-}
-
-/**
-  * Copy constructor for tree. Not allowing for implicit conversion.
-*/
-template<class dataType>
-BTree<dataType>::BTree(const node& refTree)
-{	
-	if(refTree == nullptr)
-	{
-		root = nullptr;
-		std::cout << "\ntree to copy is null." << std::endl;
-	}
-	else
-	{
-		copyTree(root, refTree);
-	}
-}
-
-/**
-  * Copy a tree.
-  * Called by copy constructor?
-  * Should this just be in copy constructor?
-*/
-template<class dataType>
-void BTree<dataType>::copyTree(node* newTree, const node*& oldTree)
-{
-	if(oldTree == nullptr)
-	{
-		newTree = nullptr;
-		std::cout << "\noldTree: " << oldTree << std::endl;
-		std::cout << "\nOld tree is null so new tree is null: " << std::endl;
-	}
-	else
-	{
-		newTree = new node();
-		newTree->info = oldTree->info;
-		std::cout << "\nnewtree%: " << newTree << std::endl;
-		std::cout << "\nnewtreeinfo: " << newTree->info << std::endl;
-		std::cout << "\noldtreeinfo: " << oldTree->info << std::endl;
-		copyTree(newTree->left, oldTree->left);
-		copyTree(newTree->right, oldTree->right);
-	}
-
-	std::cout << "\nnewTree out of if else: " << newTree;
-}
-
-/**
-  * Overloaded = operator.
-  * Invokes copy constructor.
-*/
-template<class dataType>
-const BTree<dataType>& BTree<dataType>::operator=(const BTree<dataType>& rVal)
-{
-	if(this != &rVal)
-	{
-		if(root != nullptr)
-			destroy(root);
-		if(rVal.root = nullptr)
-			root = nullptr;
-		else
-			copyTree(root, rVal.root);
-	}
-
-	return(*this);
-}
-
-/**
-  * Returns true if empty, false if filled.
-*/
-template<class dataType>
-bool BTree<dataType>::isEmpty() const
-{
-	return(root == nullptr); // 1/true if null 0/false if not null
-}
-
-/**
-  * Returns height of binary tree.
-  * Recursively calls height();
-*/
-template<class dataType>
-int BTree<dataType>::getHeight() const
-{
-	return(getHeight(root));
 }
 
 /**
@@ -326,16 +429,20 @@ int BTree<dataType>::getLeafNum()
 
 /**
   * De-allocates tree.
-  * Should this be in the destructor? Or invoked by the destructor?
+  * Invoked by the destructor.
+  * Public.
 */
 template<class dataType>
 void BTree<dataType>::destroyTree()
 {
-	destroyTree(root);
+	if(root != nullptr)
+		destroyTree(root);
 }
 
 /**
+  * Binary Search.
   * Returns true if data is located in tree. False otherwise.
+  * Public.
 */
 template<class dataType>
 bool BTree<dataType>::search(const dataType& searchData) const
@@ -364,6 +471,7 @@ bool BTree<dataType>::search(const dataType& searchData) const
 
 /**
   * Inserts data into tree.
+  * Done.
 */
 template<class dataType>
 void BTree<dataType>::insert(const dataType& insertData)
@@ -372,10 +480,7 @@ void BTree<dataType>::insert(const dataType& insertData)
 	node* trailCurrent;
 	node* newNode;
 	
-	newNode = new node();
-	newNode->info = insertData;
-	newNode->left = nullptr;
-	newNode->right = nullptr;
+	newNode = new node(insertData);
 
 	if(root == nullptr)
 	{
@@ -406,6 +511,7 @@ void BTree<dataType>::insert(const dataType& insertData)
 
 /**
   * Deletes a node with the same dataType as deleteItem.
+  * Public.
 */	
 template<class dataType>
 void BTree<dataType>::deleteNode(const dataType& deleteItem)
@@ -455,59 +561,5 @@ void BTree<dataType>::deleteNode(const dataType& deleteItem)
 		delete current;
 	}
 }
-
-/**
-  * Destroys tree. Recursively called.
-  * Should this be in destructor?
-*/
-template<class dataType>
-void BTree<dataType>::destroyTree(node* p)
-{
-	if(p != nullptr)
-	{
-		destroy(p->left);
-		destroy(p->right);
-		delete(p);
-		p = nullptr;
-	}
-}
-
-/**
-  * Recursively counts height of binary tree.
-  * Returns max of left and right.
-  * Why not just use math lib for max rather than invoking a private func??
-*/
-template<class dataType>
-int BTree<dataType>::getHeight(node* p) const
-{
-	if(p == nullptr)
-		return(0);
-	else
-		return( (max(getHeight(p->left), getHeight(p->right)) + 1));
-}
-
-/**
-  * Recursively counts the amount of nodes.
-template<class dataType>
-int BTree<dataType>::getNodeNum(node* p) const
-{
-}*/
-
-/**
-  * Recursively counts the amount of leaves.
-template<class dataType>
-int BTree<dataType>::getLeafNum(node* p) const
-{
-}*/
-
-template<class dataType>
-int BTree<dataType>::max(int x, int y) const
-{
-	if(x >= y)
-		return(x);
-	else
-		return(y);
-}
-
 
 #endif

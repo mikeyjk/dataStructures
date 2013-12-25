@@ -26,11 +26,13 @@ TEST(CopyConstruct, Initial)
 	// search for int 2, should exist
 	EXPECT_EQ(true, original.search(2));
 
-	BTree<int> copied(original);
+	original.printTree();
 
-	EXPECT_EQ(true, copied.search(2));	
+	BTree<int> copied{original};
 
-	copied.printTree();
+	//EXPECT_EQ(true, copied.search(2));	
+
+	//copied.printTree();
 }
 
 // insert an element and be able to find it
