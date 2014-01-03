@@ -20,7 +20,7 @@
   *
   * Left sub-tree contains nodes with keys less than the node's key.
   * Right sub-tree contains nodes with keys greater than the node's key.
-  * Left & Right sub-tree are also BSTrees.
+  * Left & Right sub-tree are also binary trees.
   * Must contain no duplicate nodes.
   *
   * Space: O(n), worst O(n) (linked list)
@@ -34,10 +34,11 @@
   *	  - destructor, copy ctr, move ctr, copy assignment operator, 
   *	  move assignment operator.
   *	  
-  *	  UPDATE PTRS TO REFS
-  *
-  * Notes: C++ passes pointers by value unless an ampersand is used to denote pass
-  * by reference.
+  * Notes: 
+  * 
+  * Member properties are public, then private, with the exclusion 
+  * of the node struct. This is placed at the beginning otherwise 
+  * it wont compile. 
   *
 */
 
@@ -60,67 +61,8 @@ class BTree
 			// default constructor
 			// forces inserts to be data-centric and without children
 			node(const dataType& data) 
-			: info(data), left(nullptr), right(nullptr) {}
+			: info{data}, left{nullptr}, right{nullptr} {}
 		};
-
-		/**
-		  * Head of tree.
-		*/
-		node* root;
-
-		/**
-		  * Copy a tree.
-		  * Called by copy constructor.
-		  * Used recursively on left and right sub tree.
-		  * Non const function as it alters newTree.
-		  * @newTree - node pointer reference.
-		  * @oldTree - const node pointer to a const node reference.
-		*/
-		void copyTree(node*& newTree, const node* const &oldTree);
-	
-		/**
-		  * Destroys tree. Recursively called.
-		  * Non const function as it alters tree.
-		  * @tree - node pointer reference. non const as this is altered.
-		*/
-		void destroyTree(node* &tree);
-
-		/**
-		  * Recursively counts height of binary tree.
-		  * Returns max of left and right.
-		  * Const function as it does not alter any data.
-		  * @tree - const node pointer to a const node reference.
-		  *
-		*/
-		int getHeight(const node* const &tree) const;
-
-		/**
-		  * Recursively counts the amount of nodes.
-		  * TODO: This.
-		*/
-		//int getNodeNum(node* p) const;
-
-		/**
-		  * Recursively counts the amount of leaves.
-		  * TODO: This.
-		*/
-	//	int getLeafNum(node* p) const;
-
-		/**
-		  * Returns the maximum of 2 values.
-		  * Once again just following the book but why wouldn't an STL call be invoked.
-		  * Const function as it does not alter any data.
-		  * TODO: Replace this with <math> max() or something.
-		*/
-		int max(int x, int y) const;
-
-		/**
-		 * Recursively prints out Binary Tree to std out.
-		 * Private.
-		 * Const function as it does not alter any data.
-		 * @tree - const node pointer to const node reference.
-		 * */
-		void printTree(const node* const &tree) const;
 	
 	public:
 
@@ -182,6 +124,7 @@ class BTree
 		/**
 		  * De-allocates tree.
 		  * Invoked by the destructor.
+		  * Non-const as it alters data.
 		*/
 		void destroyTree();
 
@@ -191,22 +134,83 @@ class BTree
 		  * Const as function does not alter tree.
 		  * @treeInfo - const dataType reference.
 		*/
-		bool search(const dataType& treeInfo) const;
+		bool search(const dataType &treeInfo) const;
 
 		/**
 		  * Inserts data into tree.
 		  * @treeInfo - const dataType reference. not modifiable.
 		  * Non const as function alters tree.
 		*/
-		void insert(const dataType& treeInfo);
+		void insert(const dataType &treeInfo);
 	
 		/**
 		  * Deletes a node with the same dataType as deleteItem.
-		  * @treeInfo - const dataType reference. not modifiable.
+		  * @treeInfo - node pointer reference. 
 		  * Non const as function alters tree.
 		*/	
-		void deleteNode(const dataType& deleteItem);
-		
+		void deleteNode(node* deleteItem);
+	
+	private:
+
+		/**
+		  * Head of tree.
+		*/
+		node* root;
+
+		/**
+		  * Copy a tree.
+		  * Called by copy constructor.
+		  * Used recursively on left and right sub tree.
+		  * Non const function as it alters newTree.
+		  * @newTree - node pointer reference.
+		  * @oldTree - const node pointer to a const node reference.
+		*/
+		void copyTree(node*& newTree, const node* const &oldTree);
+	
+		/**
+		  * Destroys tree. Recursively called.
+		  * Non const function as it alters tree.
+		  * @tree - node pointer reference. non const as this is altered.
+		*/
+		void destroyTree(node* &tree);
+
+		/**
+		  * Recursively counts height of binary tree.
+		  * Returns max of left and right.
+		  * Const function as it does not alter any data.
+		  * @tree - const node pointer to a const node reference.
+		  *
+		*/
+		int getHeight(const node* const &tree) const;
+
+		/**
+		  * Recursively counts the amount of nodes.
+		  * TODO: This.
+		*/
+		//int getNodeNum(node* p) const;
+
+		/**
+		  * Recursively counts the amount of leaves.
+		  * TODO: This.
+		*/
+	//	int getLeafNum(node* p) const;
+
+		/**
+		  * Returns the maximum of 2 values.
+		  * Once again just following the book but why wouldn't an STL call be invoked.
+		  * Const function as it does not alter any data.
+		  * TODO: Replace this with <math> max() or something.
+		*/
+		int max(const int x, const int y) const;
+
+		/**
+		 * Recursively prints out Binary Tree to std out.
+		 * Private.
+		 * Const function as it does not alter any data.
+		 * @tree - const node pointer to const node reference.
+		 * */
+		void printTree(const node* const &tree) const;
+	
 };
 
 /** Templated Function Definitions */
@@ -222,7 +226,7 @@ void BTree<dataType>::copyTree(node*& newTree, const node* const &oldTree)
 	}
 	else // not null
 	{
-		newTree = new node(oldTree->info);
+		newTree = new node{oldTree->info};
 	       	copyTree(newTree->left, oldTree->left);
 		copyTree(newTree->right, oldTree->right);
 	}
@@ -240,7 +244,6 @@ void BTree<dataType>::destroyTree(node* &tree)
 		delete(tree);
 		
 		tree = nullptr;
-		
 	}
 }
 
@@ -250,7 +253,7 @@ int BTree<dataType>::getHeight(const node* const &tree) const
 	if(tree == nullptr)
 		return(0);
 	else
-		return( (max(getHeight(tree->left), getHeight(tree->right)) + 1));
+		return((max(getHeight(tree->left), getHeight(tree->right)) + 1));
 }
 
 /**
@@ -387,7 +390,7 @@ void BTree<dataType>::destroyTree()
 template<class dataType>
 bool BTree<dataType>::search(const dataType& searchData) const
 {
-	node* current;
+	node* current = nullptr;
 
 	bool found = false;
 
@@ -410,35 +413,48 @@ bool BTree<dataType>::search(const dataType& searchData) const
 }
 
 template<class dataType>
-void BTree<dataType>::insert(const dataType& treeInfo)
+void BTree<dataType>::insert(const dataType &treeInfo)
 {
-	node* current;
-	node* trailCurrent;
-	node* newNode;
-	
-	newNode = new node(treeInfo);
+	node* newNode = nullptr;
 
-	if(root == nullptr)
+	newNode = new node{treeInfo}; // initialise a node with data to be inserted
+
+	if(root == nullptr) // if tree has not yet been initialised
 	{
-		root = newNode; 
+		root = newNode; // data to be inserted is now the head of the tree
 	}
-	else
+	else // root is not null / tree is initialised
 	{
-		current = root;
+		node* current = nullptr;
+		node* trailCurrent = nullptr;
 		
+		current = root;
+	
+		// loops through the tree
+		// traverses left if insert data is smaller than tree node
+		// traverses right if insert data is larger than tree node 
+		// once current == nullptr an appropriate position in the tree is found
 		while(current != nullptr)
 		{
 			trailCurrent = current;
 			
-			if(current->info == treeInfo)
-				return;
-			else if(current->info > treeInfo)
-				current = current->left;
-			else
-				current = current->right;
+			if(current->info == treeInfo) // a duplicate data value
+			{
+				return; 
+			}
+			else  // not a duplicate
+			{
+				if(treeInfo < current->info) // smaller goes to the left
+					current = current->left;
+				else
+					current = current->right; // larger goes to the right
+			}
 		}
 	
-		if(trailCurrent->info > treeInfo)
+		// current is now nullptr so this cannot be reference
+		// hence trailCurrent which has a null left node and null right node (current)
+		// newNode is then assigned to this null node thus completeing insertion
+		if(treeInfo < trailCurrent->info)
 			trailCurrent->left = newNode;
 		else
 			trailCurrent->right = newNode;
@@ -450,14 +466,17 @@ void BTree<dataType>::insert(const dataType& treeInfo)
  * Clearly this is meant to be a node.
  * */
 template<class dataType>
-void BTree<dataType>::deleteNode(const dataType &deleteItem)
+void BTree<dataType>::deleteNode(node* deleteItem)
 {
-	node* current;
-	node* trailCurrent;
-	node* temp;
+	node* current = nullptr;
+	node* trailCurrent = nullptr;
+	node* temp = nullptr;
 
+	// nothing to delete
 	if(deleteItem == nullptr)
+	{
 		return;
+	}
 	else if(deleteItem->left == nullptr && deleteItem->right == nullptr)
 	{
 		temp = deleteItem;

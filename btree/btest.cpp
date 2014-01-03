@@ -2,13 +2,16 @@
 #include <gtest/gtest.h>
 
 // default constructor
-TEST(Construct, Initial)
+TEST(IsEmpty, Initial)
 {
-	BTree<int>* test = new BTree<int>();
+	BTree<int>* emptIntTree = new BTree<int>();
+	BTree<double>* emptDoubTree = new BTree<double>();
 
-	EXPECT_EQ(true, test->isEmpty());
+	EXPECT_EQ(true, emptIntTree->isEmpty());
+	EXPECT_EQ(true, emptDoubTree->isEmpty());
 
-	delete test;
+	delete emptIntTree;
+	delete emptDoubTree;
 }
 
 // copy cstror
