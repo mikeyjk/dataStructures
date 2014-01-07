@@ -2,6 +2,7 @@
 #define btree_h
 
 #include <iostream>
+#include <memory> // shared_ptr
 
 /** 
   * Class: BTree
@@ -34,11 +35,9 @@
   *	  - destructor, copy ctr, move ctr, copy assignment operator, 
   *	  move assignment operator.
   *	  
-  * Notes: 
-  * 
-  * Member properties are public, then private, with the exclusion 
-  * of the node struct. This is placed at the beginning otherwise 
-  * it wont compile. 
+  * Decided to use shared_ptr - dat c++11.
+  * Unique_ptr isn't an appropriate choice as sometimes nodes need
+  *   to temporarily have 2 owners.
   *
 */
 
@@ -55,29 +54,34 @@ class BTree
 		struct node
 		{
 			dataType info;
-			node* left;
-			node* right;
+			std::shared_ptr<node> left;
+			std::shared_ptr<node> right;
 
 			// default constructor
 			// forces inserts to be data-centric and without children
-			node(const dataType& data) 
+			node(const dataType &data) 
 			: info{data}, left{nullptr}, right{nullptr} {}
 		};
-	
+		
+		/**
+		  * Head of tree.
+		*/
+		std::shared_ptr<node> root;
+
 	public:
 
 		/**
 		  * Default constructor.
 		  * Prevents implicit conversion.
 		*/
-		explicit BTree();	
+		explicit BTree() : root{nullptr} {};	
 	
 		/**
 		  * Copy constructor. 
 		  * Prevents implicit conversion.
 		  * @tree - const templated tree reference.
 		*/
-		explicit BTree(const BTree<dataType>& tree);
+		explicit BTree(const BTree<dataType> &tree);
 		
 		/**
 		  * Destructor. 
@@ -89,7 +93,7 @@ class BTree
 		  * Invokes copy constructor.
 		  * @rVal - const templated tree reference.
 		*/
-		const BTree<dataType>& operator=(const BTree<dataType>& rVal);
+		const BTree<dataType>& operator=(const BTree<dataType> &rVal);
 
 		/**
 		  * Returns true if empty, false if filled.
@@ -148,15 +152,10 @@ class BTree
 		  * @treeInfo - node pointer reference. 
 		  * Non const as function alters tree.
 		*/	
-		void deleteNode(node* deleteItem);
+		void deleteNode(std::shared_ptr<node> deleteItem);
 	
 	private:
-
-		/**
-		  * Head of tree.
-		*/
-		node* root;
-
+		
 		/**
 		  * Copy a tree.
 		  * Called by copy constructor.
@@ -165,14 +164,14 @@ class BTree
 		  * @newTree - node pointer reference.
 		  * @oldTree - const node pointer to a const node reference.
 		*/
-		void copyTree(node*& newTree, const node* const &oldTree);
+		void copyTree(std::shared_ptr<node>& newTree, const std::shared_ptr<node> &oldTree);
 	
 		/**
 		  * Destroys tree. Recursively called.
 		  * Non const function as it alters tree.
 		  * @tree - node pointer reference. non const as this is altered.
 		*/
-		void destroyTree(node* &tree);
+		void destroyTree(std::shared_ptr<node> &tree);
 
 		/**
 		  * Recursively counts height of binary tree.
@@ -181,7 +180,7 @@ class BTree
 		  * @tree - const node pointer to a const node reference.
 		  *
 		*/
-		int getHeight(const node* const &tree) const;
+		int getHeight(const std::shared_ptr<node> &tree) const;
 
 		/**
 		  * Recursively counts the amount of nodes.
@@ -209,7 +208,7 @@ class BTree
 		 * Const function as it does not alter any data.
 		 * @tree - const node pointer to const node reference.
 		 * */
-		void printTree(const node* const &tree) const;
+		void printTree(const std::shared_ptr<node> &tree) const;
 	
 };
 
@@ -218,37 +217,35 @@ class BTree
 /** Private */
 
 template<class dataType>
-void BTree<dataType>::copyTree(node*& newTree, const node* const &oldTree)
+void BTree<dataType>::copyTree(std::shared_ptr<node>& newTree, const std::shared_ptr<node> &oldTree)
 {
-	if(oldTree == nullptr)
+	if(oldTree == nullptr) // old tree is null, so new tree is null
 	{
 		newTree = nullptr;
 	}
 	else // not null
 	{
-		newTree = new node{oldTree->info};
-	       	copyTree(newTree->left, oldTree->left);
-		copyTree(newTree->right, oldTree->right);
+		newTree = std::make_shared<node>(oldTree->info); // store data
+	       	copyTree(newTree->left, oldTree->left); // attempt left link
+		copyTree(newTree->right, oldTree->right); // attempt right link
 	}
 }
 
 template<class dataType>
-void BTree<dataType>::destroyTree(node* &tree)
+void BTree<dataType>::destroyTree(std::shared_ptr<node> &tree)
 {
 	if(tree != nullptr)
 	{
-		destroyTree(tree->left);
+		destroyTree(tree->left); // check left
 		
-		destroyTree(tree->right);
+		destroyTree(tree->right); // check right
 		
-		delete(tree);
-		
-		tree = nullptr;
+		tree = nullptr; // should let shared_ptr know to delete
 	}
 }
 
 template<class dataType>
-int BTree<dataType>::getHeight(const node* const &tree) const
+int BTree<dataType>::getHeight(const std::shared_ptr<node> &tree) const
 {
 	if(tree == nullptr)
 		return(0);
@@ -280,7 +277,7 @@ int BTree<dataType>::max(int x, int y) const
 }
 
 template<class dataType>
-void BTree<dataType>::printTree(const node* const &refTree) const
+void BTree<dataType>::printTree(const std::shared_ptr<node> &refTree) const
 {
 	if(refTree != nullptr)
 	{
@@ -297,12 +294,6 @@ void BTree<dataType>::printTree(const node* const &refTree) const
 }
 
 /** Public */
-
-template<class dataType>
-BTree<dataType>::BTree()	
-{
-	root = nullptr;
-}
 
 template<class dataType>
 BTree<dataType>::BTree(const BTree<dataType>& refTree)
@@ -390,22 +381,24 @@ void BTree<dataType>::destroyTree()
 template<class dataType>
 bool BTree<dataType>::search(const dataType& searchData) const
 {
-	node* current = nullptr;
-
+	std::shared_ptr<node> current = nullptr; // temp node pointer to iterate tree
+	
 	bool found = false;
 
-	if(root == nullptr)
+	if(root == nullptr) // tree not initialised, exit obviously
 		found = false;
 	else
 	{
 		current = root;
-
+		
 		while(current != nullptr && !found)
 		{
 			if(current->info == searchData)
 				found = true;
 			else if(current->info > searchData)
 				current = current->right;
+			else
+				current = current->left;
 		}
 	}
 
@@ -415,9 +408,7 @@ bool BTree<dataType>::search(const dataType& searchData) const
 template<class dataType>
 void BTree<dataType>::insert(const dataType &treeInfo)
 {
-	node* newNode = nullptr;
-
-	newNode = new node{treeInfo}; // initialise a node with data to be inserted
+	std::shared_ptr<node> newNode = std::make_shared<node>(treeInfo); // initialise a node with data to be inserted
 
 	if(root == nullptr) // if tree has not yet been initialised
 	{
@@ -425,8 +416,8 @@ void BTree<dataType>::insert(const dataType &treeInfo)
 	}
 	else // root is not null / tree is initialised
 	{
-		node* current = nullptr;
-		node* trailCurrent = nullptr;
+		std::shared_ptr<node> current = nullptr;
+		std::shared_ptr<node> trailCurrent = nullptr;
 		
 		current = root;
 	
@@ -437,7 +428,6 @@ void BTree<dataType>::insert(const dataType &treeInfo)
 		while(current != nullptr)
 		{
 			trailCurrent = current;
-			
 			if(current->info == treeInfo) // a duplicate data value
 			{
 				return; 
@@ -461,16 +451,12 @@ void BTree<dataType>::insert(const dataType &treeInfo)
 	}
 }
 
-/**
- * TODO: Pretttyyy sure this is broken. How can I derference a templated type.
- * Clearly this is meant to be a node.
- * */
 template<class dataType>
-void BTree<dataType>::deleteNode(node* deleteItem)
+void BTree<dataType>::deleteNode(std::shared_ptr<node> deleteItem)
 {
-	node* current = nullptr;
-	node* trailCurrent = nullptr;
-	node* temp = nullptr;
+	std::shared_ptr<node> current = nullptr;
+	std::shared_ptr<node> trailCurrent = nullptr;
+	std::shared_ptr<node> temp = nullptr;
 
 	// nothing to delete
 	if(deleteItem == nullptr)
