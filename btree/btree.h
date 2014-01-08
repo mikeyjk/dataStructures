@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <memory> // shared_ptr
+#include <algorithm> // std::max()
 
 /** 
   * Class: BTree
@@ -117,13 +118,16 @@ class BTree
 		
 		/**
 		  * Get amount of nodes in the tree.
+		  * Aka node with a valid left or right link.
 		*/	
-	//	int getNodeNum();
+		int getNodeNum() const;
 
 		/**
 		  * Return amount of leaves in the tree.
+		  * Aka node with no valid left or right link.
+		  *
 		*/
-	//	int getLeafNum();
+		int getLeafNum() const;
 
 		/**
 		  * De-allocates tree.
@@ -184,23 +188,13 @@ class BTree
 
 		/**
 		  * Recursively counts the amount of nodes.
-		  * TODO: This.
 		*/
-		//int getNodeNum(node* p) const;
+		int getNodeNum(const std::shared_ptr<node> &tree) const;
 
 		/**
 		  * Recursively counts the amount of leaves.
-		  * TODO: This.
 		*/
-	//	int getLeafNum(node* p) const;
-
-		/**
-		  * Returns the maximum of 2 values.
-		  * Once again just following the book but why wouldn't an STL call be invoked.
-		  * Const function as it does not alter any data.
-		  * TODO: Replace this with <math> max() or something.
-		*/
-		int max(const int x, const int y) const;
+		int getLeafNum(const std::shared_ptr<node> &tree) const;
 
 		/**
 		 * Recursively prints out Binary Tree to std out.
@@ -213,85 +207,6 @@ class BTree
 };
 
 /** Templated Function Definitions */
-
-/** Private */
-
-template<class dataType>
-void BTree<dataType>::copyTree(std::shared_ptr<node>& newTree, const std::shared_ptr<node> &oldTree)
-{
-	if(oldTree == nullptr) // old tree is null, so new tree is null
-	{
-		newTree = nullptr;
-	}
-	else // not null
-	{
-		newTree = std::make_shared<node>(oldTree->info); // store data
-	       	copyTree(newTree->left, oldTree->left); // attempt left link
-		copyTree(newTree->right, oldTree->right); // attempt right link
-	}
-}
-
-template<class dataType>
-void BTree<dataType>::destroyTree(std::shared_ptr<node> &tree)
-{
-	if(tree != nullptr)
-	{
-		destroyTree(tree->left); // check left
-		
-		destroyTree(tree->right); // check right
-		
-		tree = nullptr; // should let shared_ptr know to delete
-	}
-}
-
-template<class dataType>
-int BTree<dataType>::getHeight(const std::shared_ptr<node> &tree) const
-{
-	if(tree == nullptr)
-		return(0);
-	else
-		return((max(getHeight(tree->left), getHeight(tree->right)) + 1));
-}
-
-/**
-  * Recursively counts the amount of nodes.
-template<class dataType>
-int BTree<dataType>::getNodeNum(node* p) const
-{
-}*/
-
-/**
-  * Recursively counts the amount of leaves.
-template<class dataType>
-int BTree<dataType>::getLeafNum(node* p) const
-{
-}*/
-
-template<class dataType>
-int BTree<dataType>::max(int x, int y) const
-{
-	if(x >= y)
-		return(x);
-	else
-		return(y);
-}
-
-template<class dataType>
-void BTree<dataType>::printTree(const std::shared_ptr<node> &refTree) const
-{
-	if(refTree != nullptr)
-	{
-		std::cout << refTree->info << std::endl;
-		std::cout << " / " << std::endl;
-		printTree(refTree->left);
-		std::cout << " \\" << std::endl;
-		printTree(refTree->right);	
-	}
-	else
-	{
-		std::cout << "Null." << std::endl;
-	}
-}
 
 /** Public */
 
@@ -341,6 +256,18 @@ int BTree<dataType>::getHeight() const
 }
 
 template<class dataType>
+int BTree<dataType>::getNodeNum() const
+{
+	return(getNodeNum(root));
+}
+
+template<class dataType>
+int BTree<dataType>::getLeafNum() const
+{
+	return(getLeafNum(root));
+}
+
+template<class dataType>
 void BTree<dataType>::printTree() const
 {
 	if(root != nullptr)
@@ -355,21 +282,6 @@ void BTree<dataType>::printTree() const
 	}
 }
 
-/**
-  * Get amount of nodes in the tree.
-template<class dataType>
-int BTree<dataType>::getNodeNum()
-{
-	return(getNodeNum(root));
-}*/
-
-/**
-  * Return amount of leaves in the tree.
-template<class dataType>
-int BTree<dataType>::getLeafNum()
-{
-	return(getLeafNum(root));
-}*/
 
 template<class dataType>
 void BTree<dataType>::destroyTree()
@@ -465,21 +377,19 @@ void BTree<dataType>::deleteNode(std::shared_ptr<node> deleteItem)
 	}
 	else if(deleteItem->left == nullptr && deleteItem->right == nullptr)
 	{
-		temp = deleteItem;
 		deleteItem = nullptr;
-		delete temp;
 	}
 	else if(deleteItem->left == nullptr)
 	{
 		temp = deleteItem;
 		deleteItem = temp->right;
-		delete temp;
+		temp = nullptr;
 	}
 	else if(deleteItem->right == nullptr)
 	{
 		temp = deleteItem;
 		deleteItem = temp->left;
-		delete temp;
+		temp = nullptr;
 	}
 	else
 	{
@@ -499,7 +409,93 @@ void BTree<dataType>::deleteNode(std::shared_ptr<node> deleteItem)
 		else
 			trailCurrent->right = current->left;
 
-		delete current;
+		current = nullptr;
+	}
+}
+
+
+/** Private */
+
+template<class dataType>
+void BTree<dataType>::copyTree(std::shared_ptr<node>& newTree, const std::shared_ptr<node> &oldTree)
+{
+	if(oldTree == nullptr) // old tree is null, so new tree is null
+	{
+		newTree = nullptr;
+	}
+	else // not null
+	{
+		newTree = std::make_shared<node>(oldTree->info); // store data
+	       	copyTree(newTree->left, oldTree->left); // attempt left link
+		copyTree(newTree->right, oldTree->right); // attempt right link
+	}
+}
+
+template<class dataType>
+void BTree<dataType>::destroyTree(std::shared_ptr<node> &tree)
+{
+	if(tree != nullptr)
+	{
+		destroyTree(tree->left); // check left
+		
+		destroyTree(tree->right); // check right
+		
+		tree = nullptr; // should let shared_ptr know to delete
+	}
+}
+
+template<class dataType>
+int BTree<dataType>::getHeight(const std::shared_ptr<node> &tree) const
+{
+	if(tree == nullptr)
+		return(0);
+	else
+		return(1 + std::max(getHeight(tree->left), getHeight(tree->right)));
+}
+
+template<class dataType>
+int BTree<dataType>::getNodeNum(const std::shared_ptr<node> &tree) const
+{
+	if(tree = nullptr)
+		return(0);
+	else
+	{
+		if(tree->left == nullptr && tree->right == nullptr)
+			return(1);
+		else
+			return(1 + (getNodeNum(tree->left) + getNodeNum(tree->right)));
+	}
+}
+
+template<class dataType>
+int BTree<dataType>::getLeafNum(const std::shared_ptr<node> &tree) const
+{
+	if(tree = nullptr)
+	    return(0);
+	else
+	{
+		if(tree->left == nullptr && tree->right == nullptr)
+		    return(1);
+		else
+		    return(getLeafNum(tree->left) + getLeafNum(tree->right));
+	}
+
+}
+
+template<class dataType>
+void BTree<dataType>::printTree(const std::shared_ptr<node> &refTree) const
+{
+	if(refTree != nullptr)
+	{
+		std::cout << refTree->info << std::endl;
+		std::cout << " / " << std::endl;
+		printTree(refTree->left);
+		std::cout << " \\" << std::endl;
+		printTree(refTree->right);	
+	}
+	else
+	{
+		std::cout << "Null." << std::endl;
 	}
 }
 
