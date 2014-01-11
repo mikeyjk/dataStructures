@@ -1,10 +1,17 @@
+# Makefile
+# For binary search tree
+# Uses google unit test lib
+# Author: Michael J. Kiernan
+
+CC=g++
+
+CFLAGS=-std=c++11 -Wall -Werror -Wuninitialized
+
+# google unit test lib
+LDFLAGS=-I../gtest*/include/ ../libgtest.a -lpthread
+
 btest:
-	g++ -std=c++11 -Wall -Werror -Wuninitialized -I../gtest*/include/ btest.cpp libgtest.a -lpthread -o btest
+	$(CC) $(CFLAGS) $(LDFLAGS) btest.cpp -o btest
 
 btree:
-	g++ -std=c++11 -Wall -Werror -Wuninitialized -c btree.h
-
-test:
-	g++ -std=c++11 -Wall -Werror -Wuninitialized test.cpp -o test
-
-
+	$(CC) $(CFLAGS) -c btree.h

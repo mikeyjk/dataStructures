@@ -1,5 +1,5 @@
-#ifndef btree_h
-#define btree_h
+#ifndef BTREE_H
+#define BTREE_H
 
 #include <iostream>
 #include <memory> // shared_ptr
@@ -237,7 +237,7 @@ const BTree<dataType>& BTree<dataType>::operator=(const BTree<dataType>& rVal)
 		}
 
 		if(rVal.root != nullptr) // if rvalue is null
-			copyTree(&root, rVal.root);
+			copyTree(root, rVal.root);
 	}
 
 	return(*this);
@@ -404,7 +404,7 @@ void BTree<dataType>::deleteNode(std::shared_ptr<node> deleteItem)
 
 		deleteItem->info = current->info;
 
-		if(trailCurrent = nullptr)
+		if(trailCurrent == nullptr)
 			deleteItem->left = current->left;
 		else
 			trailCurrent->right = current->left;
@@ -456,7 +456,7 @@ int BTree<dataType>::getHeight(const std::shared_ptr<node> &tree) const
 template<class dataType>
 int BTree<dataType>::getNodeNum(const std::shared_ptr<node> &tree) const
 {
-	if(tree = nullptr)
+	if(tree == nullptr)
 		return(0);
 	else
 	{
@@ -470,7 +470,7 @@ int BTree<dataType>::getNodeNum(const std::shared_ptr<node> &tree) const
 template<class dataType>
 int BTree<dataType>::getLeafNum(const std::shared_ptr<node> &tree) const
 {
-	if(tree = nullptr)
+	if(tree == nullptr)
 	    return(0);
 	else
 	{
