@@ -1,9 +1,0 @@
-# google unit test lib LDFLAGS
-#
-# assumes:
-#  - this is used in a sub directory
-#  - assumes you have run:
-#	    'cmake .'
-#	    'make'
-
-LDFLAGS-=I../gtest*/include/ ../libgtest.a -lpthread

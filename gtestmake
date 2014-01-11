@@ -1,0 +1,23 @@
+# Makefile
+# Uses google unit test lib
+# serves as an example
+
+# see btree/ if this is confusing
+
+# Author: Michael J. Kiernan
+
+CC=clang++
+
+GINC=-pthread -isystem ../gtest*/include 
+GLIB=../gtest*/libgtest.a
+
+#btest: libgtest.a
+#	$(CC) $(CFLAGS) $(GINC) btest.cpp $(GLIB) -o btest
+
+libgtest.a:
+	
+	cd gtest*/; cmake .; make; clang++ -isystem include/ -I. -pthread -c src/gtest-all.cc; \
+	    ar -rv libgtest.a gtest-all.o
+
+clean:
+	cd gtest*/; rm *.o; rm *.a
