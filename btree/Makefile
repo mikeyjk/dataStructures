@@ -3,7 +3,7 @@
 # Uses google unit test lib
 # Author: Michael J. Kiernan
 
-CC=g++
+CC=clang++
 
 CFLAGS=-std=c++11 -Wall -Werror -Wuninitialized
 
