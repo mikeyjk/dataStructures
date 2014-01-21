@@ -447,10 +447,12 @@ void BTree<dataType>::destroyTree(std::shared_ptr<node> &tree)
 template<class dataType>
 int BTree<dataType>::getHeight(const std::shared_ptr<node> &tree) const
 {
-	if(tree == nullptr)
-		return(0);
-	else
-		return(1 + std::max(getHeight(tree->left), getHeight(tree->right)));
+    if(tree == nullptr)
+	return(0);
+    else
+    {
+	return(1+(std::max(getHeight(tree->left), getHeight(tree->right))));
+    }
 }
 
 template<class dataType>
@@ -487,7 +489,7 @@ void BTree<dataType>::printTree(const std::shared_ptr<node> &refTree) const
 {
 	if(refTree != nullptr)
 	{
-		std::cout << refTree->info << std::endl;
+		std::cout << "  " << refTree->info << std::endl;
 		std::cout << " / " << std::endl;
 		printTree(refTree->left);
 		std::cout << " \\" << std::endl;
@@ -495,7 +497,7 @@ void BTree<dataType>::printTree(const std::shared_ptr<node> &refTree) const
 	}
 	else
 	{
-		std::cout << "Null." << std::endl;
+		std::cout << "-" << std::endl;
 	}
 }
 

@@ -1,12 +1,25 @@
 #include "btree.h"
 #include <gtest/gtest.h>
 
+// functions to check:
+//
+// default ctor done
+// copy ctor done
+// operator= done
+// isEmpty() done
+// getHeight() done
+// getNodeNum() done
+// getLeafNum() done
+// search() done
+// insert() done
+
 // default constructor
 TEST(IsEmpty, Initial)
 {
 	BTree<int>* emptIntTree = new BTree<int>();
 	BTree<double>* emptDoubTree = new BTree<double>();
 
+	// make sure newly constructed trees are al empty
 	EXPECT_EQ(true, emptIntTree->isEmpty());
 	EXPECT_EQ(true, emptDoubTree->isEmpty());
 
@@ -17,8 +30,8 @@ TEST(IsEmpty, Initial)
 // copy cstror
 TEST(CopyConstruct, Initial)
 {
-	BTree<int> original;
 	// empty tree
+	BTree<int> original;
 
 	// search for int 2, shouldn't exist
 	EXPECT_EQ(false, original.search(2)); 
@@ -29,11 +42,41 @@ TEST(CopyConstruct, Initial)
 	// search for int 2, should exist
 	EXPECT_EQ(true, original.search(2));
 
-	original.printTree();
+	//original.printTree();
 
+	// btree using copy constructor
 	BTree<int> copied{original};
 
-	//EXPECT_EQ(true, copied.search(2));	
+	// search for 2, should be true
+	EXPECT_EQ(true, copied.search(2));	
+
+	//copied.printTree();
+}
+
+// equals operator
+TEST(EqOp, Initial)
+{
+	// empty tree
+	BTree<int> original;
+
+	// search for int 2, shouldn't exist
+	EXPECT_EQ(false, original.search(2)); 
+	
+	// insert int 2
+	original.insert(2);
+
+	// search for int 2, should exist
+	EXPECT_EQ(true, original.search(2));
+
+	//original.printTree();
+
+	// btree using copy constructor
+	BTree<int> copied;
+	
+	copied = original;
+
+	// search for 2, should be true
+	EXPECT_EQ(true, copied.search(2));	
 
 	//copied.printTree();
 }
@@ -57,22 +100,108 @@ TEST(InsertSearch, Number)
 }
 
 // getHeight
-// remember how btree height works
 TEST(GetHeight, Number)
 {
 	BTree<int>* test = new BTree<int>();
 	
+	// just created, height should be 0
 	EXPECT_EQ(0, test->getHeight());
 
-	test->insert(2);
+	// 0 -> 1000, 1001 total
+	// store non-linearly
+	for(int i = 0; i < 1000; ++i)
+	{
+	    if(i % 2 == 0)
+		test->insert(i/2);
+	    else
+		test->insert(i);
+	}
 
-	EXPECT_EQ(1, test->getHeight());
+	EXPECT_EQ(501, test->getHeight());
+	
+	//test->printTree();
 
-	test->insert(3);
+	// this is an example of a bstree
+	// devolving into a linked list:
 
-	EXPECT_EQ(2, test->getHeight());
+	//for(int i = 0; i < 1000; ++i)
+	//{
+	//    test->insert(i);
+	//}
 
-	test->printTree();
+	// height should be 1001
+	//EXPECT_EQ(998, test->getHeight());
+
+	delete test;
+}
+// get node num
+TEST(nodeNum, Number)
+{
+	BTree<int>* test = new BTree<int>();
+	
+	// just created, height should be 0
+	EXPECT_EQ(0, test->getNodeNum());
+
+	// 0 -> 1000, 1001 total
+	// store non-linearly
+	for(int i = 0; i < 1000; ++i)
+	{
+	    if(i % 2 == 0)
+		test->insert(i/2);
+	    else
+		test->insert(i);
+	}
+
+	EXPECT_EQ(750, test->getNodeNum());
+	
+	//test->printTree();
+
+	// this is an example of a bstree
+	// devolving into a linked list:
+
+	//for(int i = 0; i < 1000; ++i)
+	//{
+	//    test->insert(i);
+	//}
+
+	// height should be 1001
+	//EXPECT_EQ(998, test->getHeight());
+
+	delete test;
+}
+
+// get leaf num
+TEST(leafNum, Number)
+{
+	BTree<int>* test = new BTree<int>();
+	
+	// just created, height should be 0
+	EXPECT_EQ(0, test->getLeafNum());
+
+	// 0 -> 1000, 1001 total
+	// store non-linearly
+	for(int i = 0; i < 1000; ++i)
+	{
+	    if(i % 2 == 0)
+		test->insert(i/2);
+	    else
+		test->insert(i);
+	}
+
+	EXPECT_EQ(250, test->getLeafNum());
+	
+	//test->printTree();
+
+	// this is an example of a bstree
+	// devolving into a linked list:
+
+	//for(int i = 0; i < 1000; ++i)
+	//{
+	//    test->insert(i);
+	//}
+
+	// height should be 1001
+	//EXPECT_EQ(998, test->getHeight());
 
 	delete test;
 }
@@ -83,66 +212,3 @@ int main(int argc, char** argv)
 	::testing::InitGoogleTest(&argc, argv);
 	return(RUN_ALL_TESTS());
 }
-		/**
-		  * Overloaded = operator.
-		  * Invokes copy constructor.
-		  * Done.
-		const BTree<dataType>& operator= (const BTree<dataType>& otherTree);
-
-		  		  * Get amount of nodes in the tree.
-		  * Done.
-	//	int getNodeNum();
-
-		  * Return amount of leaves in the tree.
-		  * Done.
-	//	int getLeafNum();
-
-		  * De-allocates tree.
-		  * Should this be in the destructor? Or invoked by the destructor?
-		  * Done.
-		void destroyTree();
-
-		  * Returns true if data is located in tree. False otherwise.
-		  * What type of search? O(n)? O(log n)?
-		  * Done.
-		bool search(const dataType& searchData) const;
-
-				  * Deletes a node with the same dataType as deleteItem.
-		void deleteNode(const dataType& deleteItem);
-		
-		  * Tree structure.
-		struct node
-		{
-			dataType info;
-			node* left;
-			node* right;
-		};
-
-		  * Head of tree.
-		  * Points to the info it contains and the left and right links.
-		node* root;
-
-		  * Copy a tree.
-		  * Called by copy constructor?
-		  * Should this just be in copy constructor?
-		  * Why is one a pointer reference and one a pointer?
-		  * Should they not both be references?
-		void copyTree(node* &newTree, const node* oldTree);
-	
-		  * Destroys tree. Recursively called.
-		  * Should this be in destructor?
-		void destroyTree(node* &p);
-
-		  * Recursively counts height of binary tree.
-		  * Returns max of left and right.
-		int getHeight(node* p) const;
-
-		  * Returns the maximum of 2 values.
-		  * Once again just following the book but why wouldn't an STL call be invoked.
-		int max(int x, int y) const;
-
-		  * Recursively counts the amount of nodes.
-		//int getNodeNum(node* p) const;
-
-		  * Recursively counts the amount of leaves.
-	//	int getLeafNum(node* p) const; */
