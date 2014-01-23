@@ -35,6 +35,9 @@
   * TODO: rule of five (for C++11):
   *	  - destructor (x), copy ctr (x), move ctr, copy assignment operator(x), 
   *	  move assignment operator.
+  * 
+  * Just added move stuff.
+  * Pretty sure no rvalues should be used by tree. need to check syntax.
   *	  
   * Decided to use shared_ptr - dat c++11.
   * Unique_ptr isn't an appropriate choice as sometimes nodes need
@@ -82,19 +85,36 @@ class BTree
 	  * Prevents implicit conversion.
 	  * @tree - const templated tree reference.
 	*/
-	explicit BTree(const BTree<dataType> &tree);
+	explicit BTree(const BTree<dataType>&);
 	
 	/**
-	  * Destructor. 
+	 * Move constructor.
+	 * Delete/hide/prevent/privatise move operation.
+	 * In the context of this class a BST should not
+	 * receive an r value.
 	*/
-	~BTree();
+	BTree<dataType>(BTree<dataType>&&) = delete;
 	
 	/**
 	  * Overloaded = operator.
 	  * Invokes copy constructor.
-	  * @rVal - const templated tree reference.
+	  * @tree - const templated tree reference.
+	  * Operates only on lvalues.
+	  * TODO: check & at end, is this only when declaring default?
 	*/
-	const BTree<dataType>& operator=(const BTree<dataType> &rVal);
+	BTree<dataType>& operator=(const BTree<dataType>&) &;
+	
+	/**
+	 * Delete/hide/prevent/privatise move operator.
+	 * In the context of this class a BST should not
+	 * receive an r value.
+	*/
+  	BTree<dataType>& operator=(BTree<dataType>&&) = delete;
+  	
+	/**
+	  * Destructor. 
+	*/
+	~BTree();
 
 	/**
 	  * Returns true if empty, false if filled.
