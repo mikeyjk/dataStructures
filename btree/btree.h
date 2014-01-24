@@ -82,35 +82,42 @@ class BTree
 
 	/**
 	  * Copy constructor. 
-	  * Prevents implicit conversion.
-	  * @tree - const templated tree reference.
+	  * Explicit prevents implicit conversion.
+	  * @const Btree<dataType>& - const templated tree reference lvalue.
 	*/
-	explicit BTree(const BTree<dataType>&);
-	
-	/**
-	 * Move constructor.
-	 * Delete/hide/prevent/privatise move operation.
-	 * In the context of this class a BST should not
-	 * receive an r value.
-	*/
-	BTree<dataType>(BTree<dataType>&&) = delete;
+	explicit BTree<dataType>(const BTree<dataType>&);
 	
 	/**
 	  * Overloaded = operator.
 	  * Invokes copy constructor.
-	  * @tree - const templated tree reference.
-	  * Operates only on lvalues.
-	  * TODO: check & at end, is this only when declaring default?
+	  * @const Btree<dataType>& - const templated tree reference.
+	  * Operatoes only on lvalues.
 	*/
-	BTree<dataType>& operator=(const BTree<dataType>&) &;
+	const BTree<dataType>& operator=(const BTree<dataType>&) &;
 	
 	/**
-	 * Delete/hide/prevent/privatise move operator.
-	 * In the context of this class a BST should not
-	 * receive an r value.
+	 * Move constructor.
+	 * Explicit prevents implicit conversion.
+	 * @Btree<dataType>&& - templated tree reference rvalue.
 	*/
-  	BTree<dataType>& operator=(BTree<dataType>&&) = delete;
-  	
+	explicit BTree<dataType>(BTree<dataType>&&);
+
+	/**
+	  * Overloaded = operator.
+	  * Invokes move (-> swap) constructor.
+	  * @Btree<dataType> - tree passed by value.
+	  * Operates only on rvalues.
+	*/
+	BTree<dataType>& operator=(BTree<dataType>) &&;
+
+	/**
+	 * Swap operation.
+	 * Stores right in left and left in right.
+	 * @Btree<dataType>& left - templated tree reference.
+	 * @Btree<dataType>& right - templated tree reference.
+	*/ 
+	void swap(BTree<dataType>& left, BTree<dataType>& right);
+
 	/**
 	  * Destructor. 
 	*/
@@ -240,15 +247,26 @@ BTree<dataType>::BTree(const BTree<dataType>& refTree)
 }
 
 template<class dataType>
+void BTree<dataType>::swap(BTree<dataType>& left, BTree<dataType>& right)
+{
+    // go as far left as possible
+    swap(left.root->left, right.root->left);
+    // go as far right as possible
+    swap(left.root->right, right.root->right);
+    // swap from bottom up
+    std::swap(left.root, right.root);
+}
+
+template<class dataType>
 BTree<dataType>::~BTree()
 {
     destroyTree();
 }
 
 template<class dataType>
-const BTree<dataType>& BTree<dataType>::operator=(const BTree<dataType>& rVal)
+const BTree<dataType>& BTree<dataType>::operator=(const BTree<dataType>& lVal) &
 {
-    if(this != &rVal) // if they don't match, otherwise we automatically have achieved our goal
+    if(this != &lVal) // if they don't match, otherwise we automatically have achieved our goal
     {
 	if(root != nullptr) // if root isn't null
 	{
@@ -256,10 +274,17 @@ const BTree<dataType>& BTree<dataType>::operator=(const BTree<dataType>& rVal)
 	    root = nullptr;
 	}
 
-	if(rVal.root != nullptr) // if rvalue is null
-	    copyTree(root, rVal.root);
+	if(lVal.root != nullptr) // if rvalue is null
+	    copyTree(root, lVal.root);
     }
 
+    return(*this);
+}
+
+template<class dataType>
+BTree<dataType>& BTree<dataType>::operator=(BTree<dataType> rVal) &&
+{
+    swap(*this, rVal);
     return(*this);
 }
 
@@ -361,7 +386,7 @@ void BTree<dataType>::insert(const dataType &treeInfo)
 	    trailCurrent = current;
 	    if(current->info == treeInfo) // a duplicate data value
 	    {
-		throw out_of_range{"Duplicate data forbidden."};
+		//throw(std::out_of_range{"Duplicate data forbidden."});
 		return; 
 	    }
 	    else  // not a duplicate
