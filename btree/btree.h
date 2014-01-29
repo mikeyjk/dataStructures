@@ -33,13 +33,13 @@
   * Author: Michael J. Kiernan
   *
   * TODO: rule of five (for C++11):
-  *	  - destructor (x), copy ctr (x), move ctr, copy assignment operator(x), 
-  *	  move assignment operator.
+  *	  - destructor (x), copy ctr (x), move ctr (x), 
+  *	  copy assignment operator(x), move assignment operator (x).
   *
-  *	  Need to step through execution and check the move operations/swap
-  *	  operations are performing as expected. I'm not yet 100% on them.
-  * 
-  * Added move operator.
+  * Removed move operator.
+  * It doesn't seem appropriate to have a move constructor/optr.
+  * As far as I can tell there is no situation whereby a BTree
+  * rval can have anything other than a nullptr root.
   *	  
   * shared_ptr used.
   * Unique_ptr isn't an appropriate choice as sometimes nodes need
@@ -80,7 +80,7 @@ class BTree
 	  * Default constructor.
 	  * Prevents implicit conversion.
 	*/
-	explicit BTree() : root{nullptr} {};	
+	explicit BTree<dataType>() : root{nullptr} {};	
 
 	/**
 	  * Copy constructor. 
@@ -97,14 +97,14 @@ class BTree
 	  * Operates only on lvalues.
 	*/
 	const BTree<dataType>& operator=(const BTree<dataType>&) &;
-	
+
 	/**
 	 * Move constructor.
 	 * Explicit prevents implicit conversion.
 	 * @Btree<dataType>&& - templated tree reference.
 	 * Operates only on rvalues.
 	*/
-	explicit BTree<dataType>(BTree<dataType>&&);
+	BTree<dataType>(BTree<dataType>&&) = delete;
 
 	/**
 	  * Overloaded = operator.
@@ -112,7 +112,7 @@ class BTree
 	  * @Btree<dataType> - tree passed by value.
 	  * Operates only on rvalues.
 	*/
-	const BTree<dataType>& operator=(BTree<dataType>) &&;
+	BTree<dataType>& operator=(BTree<dataType>&&) = delete; 
 
 	/**
 	 * Swap operation.
@@ -251,22 +251,6 @@ BTree<dataType>::BTree(const BTree<dataType>& refTree)
 }
 
 template<class dataType>
-void BTree<dataType>::swap(BTree<dataType>& left, BTree<dataType>& right)
-{
-    // is it necessary to swap bottom to top?
-    // using shared pointers will this work just doing a swap?
-    //
-    // I need to step through this in kdbg and make sure this is legit
-
-    // go as far left as possible
-    // swap(left.root->left, right.root->left);
-    // go as far right as possible
-    // swap(left.root->right, right.root->right);
-    // swap from bottom up
-    std::swap(left.root, right.root);
-}
-
-template<class dataType>
 BTree<dataType>::~BTree()
 {
     destroyTree();
@@ -287,13 +271,6 @@ const BTree<dataType>& BTree<dataType>::operator=(const BTree<dataType>& lVal) &
 	    copyTree(root, lVal.root);
     }
 
-    return(*this);
-}
-
-template<class dataType>
-const BTree<dataType>& BTree<dataType>::operator=(BTree<dataType> rVal) &&
-{
-    swap(*this, rVal);
     return(*this);
 }
 
